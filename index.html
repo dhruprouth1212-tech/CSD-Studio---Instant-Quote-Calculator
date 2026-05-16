@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSD Studio - Instant Quote Calculator</title>
+    <style>
+        /* Modern CSS Variables for Styling */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #111827;
+            text-align: center;
+        }
+
+        .calculator-container {
+            background: var(--card-bg);
+            max-width: 900px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 32px;
+            box-sizing: border-box;
+        }
+
+        /* Two Column Grid Setup */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        /* Left Column: Service Row Styles */
+        .service-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .service-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .service-row:hover {
+            border-color: var(--primary-color);
+            background: #f0f7ff;
+        }
+
+        .service-row.selected {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+
+        .service-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .service-info input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .price-tag {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Right Column: Configuration Area */
+        .config-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .config-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        /* Custom Slider Styling */
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .range-limits {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* Radio Options for Turnaround */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+
+        /* Bottom Section: Summary & Action Buttons */
+        .footer-summary {
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .total-display {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .total-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .total-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .tax-note {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: -4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+
+<h1>CSD Studio - Instant Quote Calculator</h1>
+
+<div class="calculator-container">
+    <div class="grid-layout">
+        
+        <!-- Left Column: Services -->
+        <div>
+            <h3 class="section-title">Select Services</h3>
+            <div class="service-list">
+                <div class="service-row" onclick="toggleRow(this)">
+                    <div class="service-info">
+                        <input type="checkbox" class="service-cb" data-price="500">
+                        <span>🎬 Basic Reel Editing</span>
+                    </div>
+                    <div class="price-tag">₹500</div>
+                </div>
+                <div class="service-row" onclick="toggleRow(this)">
+                    <div class="service-info">
+                        <input type="checkbox" class="service-cb" data-price="1200">
+                        <span>🪄 Advanced Editing & VFX</span>
+                    </div>
+                    <div class="price-tag">₹1,200</div>
+                </div>
+                <div class="service-row" onclick="toggleRow(this)">
+                    <div class="service-info">
+                        <input type="checkbox" class="service-cb" data-price="400">
+                        <span>🎨 Pro Color Grading</span>
+                    </div>
+                    <div class="price-tag">₹400</div>
+                </div>
+                <div class="service-row" onclick="toggleRow(this)">
+                    <div class="service-info">
+                        <input type="checkbox" class="service-cb" data-price="300">
+                        <span>🎵 Sound Design & Audio Mix</span>
+                    </div>
+                    <div class="price-tag">₹300</div>
+                </div>
+                <div class="service-row" onclick="toggleRow(this)">
+                    <div class="service-info">
+                        <input type="checkbox" class="service-cb" data-price="600">
+                        <span>🖼️ YouTube Thumbnail</span>
+                    </div>
+                    <div class="price-tag">₹600</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Configurations -->
+        <div class="config-panel">
+            <h3 class="section-title">Configure Project</h3>
+            
+            <!-- Video Slider -->
+            <div class="config-group">
+                <div class="config-label-row">
+                    <span>Number of Videos</span>
+                    <span id="video-count-label" style="font-weight: 600; color: var(--primary-color);">1 Video</span>
+                </div>
+                <input type="range" id="video-slider" min="1" max="20" value="1">
+                <div class="range-limits">
+                    <span>1</span>
+                    <span>20</span>
+                </div>
+            </div>
+
+            <!-- Turnaround Speed (Radio buttons) -->
+            <div class="config-group">
+                <span class="config-label-row" style="margin-bottom: 4px;">Turnaround Time</span>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="speed" value="standard" checked>
+                        Standard (5-7 days, included)
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="speed" value="express">
+                        Express (2-3 days, +25%)
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer Summary Section -->
+    <div class="footer-summary">
+        <div class="total-display">
+            <span class="total-label">Estimated Quote</span>
+            <span class="total-amount">₹<span id="final-price">0</span></span>
+            <span class="tax-note">Tax: ₹0 (Excluded)</span>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="resetCalculator()">Reset</button>
+            <button class="btn btn-primary" onclick="alert('Quote saved successfully!')">Get Formal Quote</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Elements Selectors
+    const checkboxes = document.querySelectorAll('.service-cb');
+    const slider = document.getElementById('video-slider');
+    const videoLabel = document.getElementById('video-count-label');
+    const speedRadios = document.querySelectorAll('input[name="speed"]');
+    const finalPriceDisplay = document.getElementById('final-price');
+
+    // Box Par Click Karne Pe Bhi Checkbox Select Hoga
+    function toggleRow(rowElement) {
+        const checkbox = rowElement.querySelector('.service-cb');
+        // Agar click input box par nahi hua hai toh checkbox toggling manually trigger karein
+        if (event.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+        }
+        
+        if (checkbox.checked) {
+            rowElement.classList.add('selected');
+        } else {
+            rowElement.classList.remove('selected');
+        }
+        calculateTotal();
+    }
+
+    // Main Live Logic Calculation Function
+    function calculateTotal() {
+        let basePrice = 0;
+
+        // 1. Selected Services ka total nikalna
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                basePrice += parseInt(cb.getAttribute('data-price'));
+                cb.closest('.service-row').classList.add('selected');
+            } else {
+                cb.closest('.service-row').classList.remove('selected');
+            }
+        });
+
+        // 2. Quantity (Slider Value) update aur multiply karna
+        const quantity = parseInt(slider.value);
+        videoLabel.textContent = quantity === 1 ? "1 Video" : `${quantity} Videos`;
+        
+        let total = basePrice * quantity;
+
+        // 3. Express Delivery check (+25% premium speed charge)
+        const selectedSpeed = document.querySelector('input[name="speed"]:checked').value;
+        if (selectedSpeed === 'express' && total > 0) {
+            total = total * 1.25;
+        }
+
+        // 4. Clean Format ke sath output show karna (e.g., 5,100)
+        finalPriceDisplay.textContent = Math.round(total).toLocaleString('en-IN');
+    }
+
+    // Reset All Inputs Function
+    function resetCalculator() {
+        checkboxes.forEach(cb => cb.checked = false);
+        slider.value = 1;
+        document.querySelector('input[value="standard"]').checked = true;
+        calculateTotal();
+    }
+
+    // Live Listeners attach karna slider aur radio buttons par
+    slider.addEventListener('input', calculateTotal);
+    speedRadios.forEach(radio => radio.addEventListener('change', calculateTotal));
+
+    // Initial load pe empty show kare
+    calculateTotal();
+</script>
+
+</body>
+</html>
