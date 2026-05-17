@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSD Studio - Instant Quote Calculator</title>
+    <title>CSD Studio - Quote Calculator & Admin</title>
     <style>
-        /* Modern CSS Variables for Styling */
         :root {
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #4b5563;
-            --border-color: #e5e7eb;
+            --primary-glow: #2563eb;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --bg-dark: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --accent-color: #3b82f6;
         }
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #1e293b, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: var(--text-main);
             margin: 0;
             padding: 40px 20px;
@@ -29,25 +31,40 @@
             min-height: 100vh;
         }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 30px;
-            color: #111827;
-            text-align: center;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .calculator-container {
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .calculator-container, .admin-container {
             background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             max-width: 900px;
             width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            padding: 32px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+            padding: 35px;
             box-sizing: border-box;
+            margin-bottom: 30px;
         }
 
-        /* Two Column Grid Setup */
+        .admin-container {
+            display: none; /* Keval login ke baad dikhega */
+            background: rgba(255, 255, 255, 0.95);
+        }
+
         .grid-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -56,234 +73,149 @@
         }
 
         @media (max-width: 768px) {
-            .grid-layout {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
+            .grid-layout { grid-template-columns: 1fr; gap: 28px; }
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 600;
             margin-top: 0;
             margin-bottom: 20px;
-            color: #111827;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
         }
 
-        /* Left Column: Service Row Styles */
-        .service-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .service-list { display: flex; flex-direction: column; gap: 14px; }
 
         .service-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 16px;
+            padding: 16px 18px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            background: #fafafa;
+            transition: all 0.25s ease;
+            background: rgba(255, 255, 255, 0.6);
         }
 
         .service-row:hover {
-            border-color: var(--primary-color);
-            background: #f0f7ff;
+            border-color: var(--accent-color);
+            background: #ffffff;
+            transform: translateY(-2px);
         }
 
         .service-row.selected {
-            border-color: var(--primary-color);
-            background: #eff6ff;
-            box-shadow: 0 0 0 1px var(--primary-color);
+            border-color: var(--accent-color);
+            background: #f0f6ff;
+            box-shadow: 0 0 0 1px var(--accent-color);
         }
 
-        .service-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-        }
+        .service-info { display: flex; align-items: center; gap: 14px; font-weight: 550; }
+        .service-info input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent-color); }
+        .price-tag { font-weight: 700; color: var(--accent-color); font-size: 16px; }
 
-        .service-info input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary-color);
-            cursor: pointer;
-        }
+        .config-panel { display: flex; flex-direction: column; gap: 28px; }
+        .config-group { display: flex; flex-direction: column; gap: 10px; }
+        .config-label-row { display: flex; justify-content: space-between; font-weight: 600; }
 
-        .price-tag {
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        /* Right Column: Configuration Area */
-        .config-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .config-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .config-label-row {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 500;
-        }
-
-        /* Custom Slider Styling */
         input[type="range"] {
             width: 100%;
-            accent-color: var(--primary-color);
-            cursor: pointer;
-            margin: 10px 0;
+            accent-color: var(--accent-color);
+            margin: 12px 0;
+            height: 6px;
+            border-radius: 5px;
+            background: #cbd5e1;
         }
 
-        .range-limits {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #9ca3af;
-        }
+        .range-limits { display: flex; justify-content: space-between; font-size: 13px; color: #64748b; }
 
-        /* Radio Options for Turnaround */
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .radio-group { display: flex; flex-direction: column; gap: 12px; }
         .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            cursor: pointer;
+            display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 550;
+            cursor: pointer; padding: 12px 14px; border: 1px solid var(--border-color);
+            border-radius: 10px; background: rgba(255, 255, 255, 0.5);
         }
 
-        .radio-option input[type="radio"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary-color);
-        }
+        .radio-option input[type="radio"] { width: 18px; height: 18px; accent-color: var(--accent-color); }
 
-        /* Bottom Section: Summary & Action Buttons */
         .footer-summary {
-            border-top: 1px solid var(--border-color);
-            padding-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .total-display {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .total-label {
-            font-size: 14px;
-            color: var(--text-muted);
-            font-weight: 500;
+            border-top: 2px solid #e2e8f0; padding-top: 28px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;
         }
 
         .total-amount {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary-color);
+            font-size: 42px; font-weight: 800;
+            background: linear-gradient(135deg, #1e4ed8 0%, #3b82f6 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .tax-note {
-            font-size: 12px;
-            color: #9ca3af;
-            margin-top: -4px;
-        }
+        .button-group { display: flex; gap: 14px; }
+        .btn { padding: 14px 28px; font-size: 15px; font-weight: 700; border-radius: 12px; cursor: pointer; border: none; transition: all 0.25s ease; }
+        .btn-primary { background: var(--primary-gradient); color: white; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-secondary { background-color: #cbd5e1; color: #1e293b; }
+        .btn-secondary:hover { background-color: #94a3b8; }
+        .btn-danger { background-color: #ef4444; color: white; padding: 6px 12px; font-size: 13px; border-radius: 6px; }
+        .btn-danger:hover { background-color: #dc2626; }
 
-        .button-group {
-            display: flex;
-            gap: 12px;
+        /* Admin Table Styling */
+        .admin-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;
         }
+        .admin-table th, .admin-table td {
+            text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0;
+        }
+        .admin-table th { background-color: #f8fafc; color: #334155; }
 
-        .btn {
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s ease;
+        .admin-login-link {
+            color: rgba(255, 255, 255, 0.6); margin-top: 20px; cursor: pointer; font-size: 14px; text-decoration: underline;
         }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: #e5e7eb;
-            color: var(--text-main);
-        }
-
-        .btn-secondary:hover {
-            background-color: #d1d5db;
-        }
+        .admin-login-link:hover { color: white; }
     </style>
 </head>
 <body>
 
 <h1>CSD Studio - Instant Quote Calculator</h1>
 
-<div class="calculator-container">
+<!-- Main Calculator Screen -->
+<div class="calculator-container" id="calculator-screen">
     <div class="grid-layout">
-        
-        <!-- Left Column: Services -->
         <div>
             <h3 class="section-title">Select Services</h3>
             <div class="service-list">
-                <div class="service-row" onclick="toggleRow(this)">
+                <div class="service-row" onclick="toggleRow(this, event)">
                     <div class="service-info">
-                        <input type="checkbox" class="service-cb" data-price="500">
+                        <input type="checkbox" class="service-cb" data-name="Basic Reel" data-price="500">
                         <span>🎬 Basic Reel Editing</span>
                     </div>
                     <div class="price-tag">₹500</div>
                 </div>
-                <div class="service-row" onclick="toggleRow(this)">
+                <div class="service-row" onclick="toggleRow(this, event)">
                     <div class="service-info">
-                        <input type="checkbox" class="service-cb" data-price="1200">
+                        <input type="checkbox" class="service-cb" data-name="Advanced & VFX" data-price="1200">
                         <span>🪄 Advanced Editing & VFX</span>
                     </div>
                     <div class="price-tag">₹1,200</div>
                 </div>
-                <div class="service-row" onclick="toggleRow(this)">
+                <div class="service-row" onclick="toggleRow(this, event)">
                     <div class="service-info">
-                        <input type="checkbox" class="service-cb" data-price="400">
+                        <input type="checkbox" class="service-cb" data-name="Color Grading" data-price="400">
                         <span>🎨 Pro Color Grading</span>
                     </div>
                     <div class="price-tag">₹400</div>
                 </div>
-                <div class="service-row" onclick="toggleRow(this)">
+                <div class="service-row" onclick="toggleRow(this, event)">
                     <div class="service-info">
-                        <input type="checkbox" class="service-cb" data-price="300">
+                        <input type="checkbox" class="service-cb" data-name="Sound Design" data-price="300">
                         <span>🎵 Sound Design & Audio Mix</span>
                     </div>
                     <div class="price-tag">₹300</div>
                 </div>
-                <div class="service-row" onclick="toggleRow(this)">
+                <div class="service-row" onclick="toggleRow(this, event)">
                     <div class="service-info">
-                        <input type="checkbox" class="service-cb" data-price="600">
+                        <input type="checkbox" class="service-cb" data-name="Thumbnail" data-price="600">
                         <span>🖼️ YouTube Thumbnail</span>
                     </div>
                     <div class="price-tag">₹600</div>
@@ -291,42 +223,31 @@
             </div>
         </div>
 
-        <!-- Right Column: Configurations -->
         <div class="config-panel">
             <h3 class="section-title">Configure Project</h3>
-            
-            <!-- Video Slider -->
             <div class="config-group">
                 <div class="config-label-row">
                     <span>Number of Videos</span>
-                    <span id="video-count-label" style="font-weight: 600; color: var(--primary-color);">1 Video</span>
+                    <span id="video-count-label" style="font-weight: 700; color: var(--accent-color);">1 Video</span>
                 </div>
                 <input type="range" id="video-slider" min="1" max="20" value="1">
-                <div class="range-limits">
-                    <span>1</span>
-                    <span>20</span>
-                </div>
+                <div class="range-limits"><span>1</span><span>20</span></div>
             </div>
 
-            <!-- Turnaround Speed (Radio buttons) -->
             <div class="config-group">
                 <span class="config-label-row" style="margin-bottom: 4px;">Turnaround Time</span>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="speed" value="standard" checked>
-                        Standard (5-7 days, included)
+                        <input type="radio" name="speed" value="Standard" checked> Standard (5-7 days)
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="speed" value="express">
-                        Express (2-3 days, +25%)
+                        <input type="radio" name="speed" value="Express"> Express (2-3 days, +25%)
                     </label>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Footer Summary Section -->
     <div class="footer-summary">
         <div class="total-display">
             <span class="total-label">Estimated Quote</span>
@@ -335,40 +256,59 @@
         </div>
         <div class="button-group">
             <button class="btn btn-secondary" onclick="resetCalculator()">Reset</button>
-            <button class="btn btn-primary" onclick="alert('Quote saved successfully!')">Get Formal Quote</button>
+            <button class="btn btn-primary" onclick="saveQuoteAndSubmit()">Get Formal Quote</button>
         </div>
     </div>
 </div>
 
+<!-- Hidden Admin Dashboard Panel -->
+<div class="admin-container" id="admin-screen">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;">
+        <h3 class="section-title" style="margin: 0; border: none;">📊 CSD Studio - Admin Panel</h3>
+        <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="logoutAdmin()">Logout</button>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Date/Time</th>
+                    <th>Services Selected</th>
+                    <th>Videos</th>
+                    <th>Speed</th>
+                    <th>Total Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table-body">
+                <!-- Saved quotes will appear here dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Admin Login Trigger Link -->
+<div class="admin-login-link" onclick="loginAdmin()">🔒 Open Admin Dashboard</div>
+
 <script>
-    // Elements Selectors
     const checkboxes = document.querySelectorAll('.service-cb');
     const slider = document.getElementById('video-slider');
     const videoLabel = document.getElementById('video-count-label');
     const speedRadios = document.querySelectorAll('input[name="speed"]');
     const finalPriceDisplay = document.getElementById('final-price');
 
-    // Box Par Click Karne Pe Bhi Checkbox Select Hoga
-    function toggleRow(rowElement) {
+    // Global variable to store quotes in browser memory (Local Storage)
+    let savedQuotes = JSON.parse(localStorage.getItem('csd_quotes')) || [];
+
+    function toggleRow(rowElement, event) {
         const checkbox = rowElement.querySelector('.service-cb');
-        // Agar click input box par nahi hua hai toh checkbox toggling manually trigger karein
-        if (event.target !== checkbox) {
-            checkbox.checked = !checkbox.checked;
-        }
-        
-        if (checkbox.checked) {
-            rowElement.classList.add('selected');
-        } else {
-            rowElement.classList.remove('selected');
-        }
+        if (event.target !== checkbox) { checkbox.checked = !checkbox.checked; }
+        checkbox.checked ? rowElement.classList.add('selected') : rowElement.classList.remove('selected');
         calculateTotal();
     }
 
-    // Main Live Logic Calculation Function
+    let calculatedTotalGlobal = 0;
     function calculateTotal() {
         let basePrice = 0;
-
-        // 1. Selected Services ka total nikalna
         checkboxes.forEach(cb => {
             if (cb.checked) {
                 basePrice += parseInt(cb.getAttribute('data-price'));
@@ -378,35 +318,101 @@
             }
         });
 
-        // 2. Quantity (Slider Value) update aur multiply karna
         const quantity = parseInt(slider.value);
         videoLabel.textContent = quantity === 1 ? "1 Video" : `${quantity} Videos`;
-        
         let total = basePrice * quantity;
 
-        // 3. Express Delivery check (+25% premium speed charge)
         const selectedSpeed = document.querySelector('input[name="speed"]:checked').value;
-        if (selectedSpeed === 'express' && total > 0) {
-            total = total * 1.25;
-        }
+        if (selectedSpeed === 'Express' && total > 0) { total = total * 1.25; }
 
-        // 4. Clean Format ke sath output show karna (e.g., 5,100)
-        finalPriceDisplay.textContent = Math.round(total).toLocaleString('en-IN');
+        calculatedTotalGlobal = Math.round(total);
+        finalPriceDisplay.textContent = calculatedTotalGlobal.toLocaleString('en-IN');
     }
 
-    // Reset All Inputs Function
+    // Function to capture data and push to admin logs
+    function saveQuoteAndSubmit() {
+        if(calculatedTotalGlobal === 0) {
+            alert("Kripya pehle koi service select karein!");
+            return;
+        }
+
+        let selectedServices = [];
+        checkboxes.forEach(cb => { if(cb.checked) selectedServices.push(cb.getAttribute('data-name')); });
+
+        const newQuote = {
+            id: Date.now(),
+            date: new Date().toLocaleString('en-IN'),
+            services: selectedServices.join(', '),
+            videos: slider.value,
+            speed: document.querySelector('input[name="speed"]:checked').value,
+            price: calculatedTotalGlobal.toLocaleString('en-IN')
+        };
+
+        savedQuotes.push(newQuote);
+        localStorage.setItem('csd_quotes', JSON.stringify(savedQuotes));
+        alert('Quote saved successfully! Form submitted.');
+        resetCalculator();
+        renderAdminTable();
+    }
+
+    // Admin Login Screen handling
+    function loginAdmin() {
+        const passwordInput = prompt("Admin Security Password Dalein:");
+        if (passwordInput === "1234") {
+            document.getElementById('admin-screen').style.display = 'block';
+            renderAdminTable();
+            document.getElementById('admin-screen').scrollIntoView({ behavior: 'smooth' });
+        } else if (passwordInput !== null) {
+            alert("Wrong Password! Access Denied.");
+        }
+    }
+
+    function logoutAdmin() {
+        document.getElementById('admin-screen').style.display = 'none';
+    }
+
+    // Render data inside Admin Area
+    function renderAdminTable() {
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '';
+
+        if(savedQuotes.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Koi quotes nahi hain abhi tak.</td></tr>`;
+            return;
+        }
+
+        savedQuotes.forEach((quote) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${quote.date}</td>
+                <td style="font-weight:600;">${quote.services}</td>
+                <td>${quote.videos}</td>
+                <td>${quote.speed}</td>
+                <td style="color:var(--accent-color); font-weight:700;">₹${quote.price}</td>
+                <td><button class="btn btn-danger" onclick="deleteQuote(${quote.id})">Delete 🗑️</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Admin item deletion logic
+    function deleteQuote(id) {
+        if(confirm("Kya aap is quote ko delete karna chahte hain?")) {
+            savedQuotes = savedQuotes.filter(quote => quote.id !== id);
+            localStorage.setItem('csd_quotes', JSON.stringify(savedQuotes));
+            renderAdminTable();
+        }
+    }
+
     function resetCalculator() {
-        checkboxes.forEach(cb => cb.checked = false);
+        checkboxes.forEach(cb => { cb.checked = false; cb.closest('.service-row').classList.remove('selected'); });
         slider.value = 1;
-        document.querySelector('input[value="standard"]').checked = true;
+        document.querySelector('input[value="Standard"]').checked = true;
         calculateTotal();
     }
 
-    // Live Listeners attach karna slider aur radio buttons par
     slider.addEventListener('input', calculateTotal);
     speedRadios.forEach(radio => radio.addEventListener('change', calculateTotal));
-
-    // Initial load pe empty show kare
     calculateTotal();
 </script>
 
